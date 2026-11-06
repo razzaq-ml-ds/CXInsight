@@ -1,0 +1,31 @@
+feedback_id,customer_id,feedback_text,rating,date,category,nps_score
+F001,C101,"Excellent service and very friendly staff",5,2026-10-01,Support,10
+F002,C102,"My delivery arrived three days late",2,2026-10-02,Delivery,3
+F003,C103,"The product quality is amazing",5,2026-10-03,Product,9
+F004,C104,"Customer support never responded to my complaint",1,2026-10-04,Support,1
+F005,C105,"The application is easy to use",4,2026-10-05,Software,8
+F006,C106,"Very poor packaging and damaged product",1,2026-10-06,Delivery,2
+F007,C107,"The delivery was quick and smooth",5,2026-10-07,Delivery,10
+F008,C108,"Average experience, nothing special",3,2026-10-08,General,6
+F009,C109,"I am disappointed with the refund process",2,2026-10-09,Support,3
+F010,C110,"Great product, worth every penny",5,2026-10-10,Product,9
+F011,C111,"The website keeps crashing",1,2026-10-11,Software,1
+F012,C112,"Friendly customer service representative",4,2026-10-12,Support,8
+F013,C113,"Delivery was late but the product is good",3,2026-10-13,Delivery,6
+F014,C114,"The checkout process is confusing",2,2026-10-14,Software,4
+F015,C115,"Absolutely loved the experience",5,2026-10-15,General,10
+F016,C116,"The product stopped working after two days",1,2026-10-16,Product,1
+F017,C117,"Reasonable price and decent quality",4,2026-10-17,Product,8
+F018,C118,"I had to contact support multiple times",2,2026-10-18,Support,3
+F019,C119,"Fast delivery and excellent packaging",5,2026-10-19,Delivery,10
+F020,C120,"The service was okay",3,2026-10-20,General,6
+F021,C121,"Terrible customer support experience",1,2026-10-21,Support,0
+F022,C122,"The new update improved the application",5,2026-10-22,Software,9
+F023,C123,"My order was missing an item",2,2026-10-23,Delivery,3
+F024,C124,"Very satisfied with my purchase",5,2026-10-24,Product,10
+F025,C125,"The refund took too long",2,2026-10-25,Support,2
+F026,C126,"The interface looks good but feels slow",3,2026-10-26,Software,6
+F027,C127,"Excellent experience from start to finish",5,2026-10-27,General,10
+F028,C128,"Poor quality and disappointing service",1,2026-10-28,Product,1
+F029,C129,"The staff was helpful and professional",4,2026-10-29,Support,8
+F030,C130,"Nothing was wrong, everything worked perfectly",5,2026-10-30,General,9
