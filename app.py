@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from src.cloudflare_llm import ask_cloudflare
 
 from src.data_processor import (
     read_raw_data,
@@ -290,7 +291,7 @@ if uploaded_file is not None:
                 f"**Topic {topic_id}:** {', '.join(keywords)}"
             )
 
-        # FEEDBACK RECORDS
+
         st.header("Customer Feedback Records")
 
         st.dataframe(
@@ -302,6 +303,78 @@ if uploaded_file is not None:
             f"Displaying the first {min(20, len(analyzed_df))} "
             f"of {len(analyzed_df)} processed feedback records."
         )
+        
+        st.divider()
+
+
+        st.header("Ask CXInsight")
+        st.write(
+            "Ask questions about your customer experience analytics "
+            "and get AI-powered business insights."
+        )
+
+        context_lines = [
+            f"Total feedback records: {total_feedback}",
+            f"Average rating: {average_rating}",
+            f"Net Promoter Score: {nps}",
+            f"Sentiment distribution: {sentiment_counts.to_dict()}",
+            f"Sentiment percentages: {sentiment_percentages.to_dict()}",
+            "",
+            "Discovered topics:"
+        ]
+
+        for _, row in topic_summary.iterrows():
+            topic_id = row["topic_id"]
+            keywords = topic_analyzer.topic_keywords.get(
+                topic_id, []
+            )
+
+            context_lines.append(
+                f"Topic {topic_id}: {row['topic_label']}; "
+                f"Feedback count: {row['Feedback Count']}; "
+                f"Keywords: {', '.join(keywords)}"
+            )
+
+        analytics_context = "\n".join(context_lines)
+
+        with st.form("cxinsight_ai_form"):
+
+            user_question = st.text_area(
+                "Your question",
+                placeholder=(
+                    "Example: What are the biggest areas "
+                    "where this business should improve?"
+                )
+            )
+
+            submitted = st.form_submit_button(
+                "Generate AI Insights"
+            )
+
+        if submitted:
+
+            if not user_question.strip():
+                st.warning("Please enter a question.")
+
+            else:
+                with st.spinner(
+                    "CXInsight is analyzing your business data..."
+                ):
+
+                    try:
+                        answer = ask_cloudflare(
+                            user_prompt=user_question,
+                            context=analytics_context
+                        )
+
+                        st.subheader("CXInsight's Answer")
+                        st.markdown(answer)
+
+                    except Exception as error:
+                        st.error(
+                            f"Unable to generate insights: {error}"
+                        )
+
 
     except Exception as error:
 
