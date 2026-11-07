@@ -27,6 +27,20 @@ def load_and_clean_data(source):
         .str.lower()
         .str.replace(" ", "_")
     )
+    # Map common dataset column names to CXInsight's standard names
+
+    column_aliases = {
+        "review_text": "feedback_text",
+        "division_name": "category",
+        "department_name": "category"
+    }
+
+    for old_name, new_name in column_aliases.items():
+        if old_name in df.columns and new_name not in df.columns:
+            df.rename(
+                columns={old_name: new_name},
+                inplace=True
+            )
 
 
     missing_columns = [
