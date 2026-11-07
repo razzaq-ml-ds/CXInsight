@@ -3,7 +3,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-from src.data_processor import load_and_clean_data
+from src.data_processor import (
+    read_raw_data,
+    load_and_clean_data
+)
+
+from src.column_detector import ColumnDetector
 from src.sentiment_analyzer import SentimentAnalyzer
 from src.analytics import CustomerAnalytics
 from src.topic_analyzer import TopicAnalyzer
@@ -32,22 +37,116 @@ uploaded_file = st.sidebar.file_uploader(
     type=["csv"]
 )
 
-if uploaded_file is not None:
-    try:
-        df = load_and_clean_data(uploaded_file)
 
-        if df.empty:
-            st.warning("No valid feedback records found.")
+if uploaded_file is not None:
+
+    try:
+
+        # STEP 1: Read the original dataset
+        raw_df = read_raw_data(uploaded_file)
+
+        if raw_df.empty:
+            st.warning("The uploaded CSV contains no records.")
             st.stop()
 
-        st.success("Dataset uploaded and processed successfully!")
+        if len(raw_df.columns) == 0:
+            st.error("The uploaded CSV contains no columns.")
+            st.stop()
 
+        # STEP 2: Detect the likely feedback column
+        detector = ColumnDetector()
+
+        detected_column, confidence, candidates = (
+            detector.detect_feedback_column(raw_df)
+        )
+
+        # Use the top candidate as the suggested default
+        suggested_column = (
+            candidates[0]["column"]
+            if candidates
+            else None
+        )
+
+        st.sidebar.divider()
+        st.sidebar.subheader("Feedback Column Selection")
+
+        if confidence == "High":
+            st.sidebar.success(
+                f"Automatically detected: {suggested_column}"
+            )
+
+        elif confidence == "Medium":
+            st.sidebar.warning(
+                "A possible feedback column was found. "
+                "Please confirm your selection."
+            )
+
+        else:
+            st.sidebar.warning(
+                "Could not confidently identify a feedback column. "
+                "Please select one manually."
+            )
+
+        # STEP 3: Let the user select or override the column
+        default_index = (
+            raw_df.columns.get_loc(suggested_column)
+            if suggested_column is not None
+            else 0
+        )
+
+        selected_column = st.sidebar.selectbox(
+            "Which column contains customer feedback?",
+            options=raw_df.columns.tolist(),
+            index=default_index,
+            help="Select the column containing customer reviews, comments, or feedback.",
+            key=f"feedback_column_{uploaded_file.name}"
+        )
+
+        st.sidebar.caption(
+            f"Selected column: {selected_column}"
+        )
+
+        # Show the detector's scoring for transparency
+        with st.expander("View column detection results"):
+
+            if candidates:
+                candidate_df = pd.DataFrame(candidates)
+                st.dataframe(
+                    candidate_df,
+                    use_container_width=True
+                )
+            else:
+                st.info(
+                    "No suitable column candidates were found."
+                )
+
+        # STEP 4: Clean the data using the selected column
+        df = load_and_clean_data(
+            raw_df,
+            feedback_column=selected_column
+        )
+
+        if df.empty:
+            st.warning(
+                "No valid feedback records found in the selected column."
+            )
+            st.stop()
+
+        st.success(
+            f"Dataset processed successfully! "
+            f"Using '{selected_column}' as the feedback column."
+        )
+
+        # STEP 5: Sentiment and topic analysis
         with st.spinner("Analyzing customer feedback..."):
+
             sentiment_analyzer = SentimentAnalyzer()
             analyzed_df = sentiment_analyzer.analyze_dataframe(df)
 
             topic_analyzer = TopicAnalyzer(n_clusters=5)
-            analyzed_df = topic_analyzer.analyze_dataframe(analyzed_df)
+            analyzed_df = topic_analyzer.analyze_dataframe(
+                analyzed_df
+            )
 
         analytics = CustomerAnalytics(analyzed_df)
 
@@ -57,6 +156,7 @@ if uploaded_file is not None:
         sentiment_percentages = analytics.get_sentiment_percentages()
         sentiment_counts = analytics.get_sentiment_distribution()
 
+        # BUSINESS OVERVIEW
         st.header("Business Overview")
 
         col1, col2, col3, col4 = st.columns(4)
@@ -91,6 +191,7 @@ if uploaded_file is not None:
 
         st.divider()
 
+        # SENTIMENT ANALYSIS
         st.header("Sentiment Analysis")
 
         chart_col1, chart_col2 = st.columns(2)
@@ -102,6 +203,7 @@ if uploaded_file is not None:
         )
 
         with chart_col1:
+
             st.subheader("Sentiment Distribution")
 
             fig = px.pie(
@@ -118,6 +220,7 @@ if uploaded_file is not None:
             )
 
         with chart_col2:
+
             st.subheader("Sentiment Percentages")
 
             percentage_df = (
@@ -146,10 +249,11 @@ if uploaded_file is not None:
 
         st.divider()
 
+        # TOPIC ANALYSIS
         st.header("Customer Feedback Topics")
 
         st.write(
-            "Discover the recurring themes in customer feedback "
+            "Discover recurring themes in customer feedback "
             "using machine learning."
         )
 
@@ -181,10 +285,12 @@ if uploaded_file is not None:
         st.subheader("Discovered Topic Keywords")
 
         for topic_id, keywords in topic_analyzer.topic_keywords.items():
+
             st.write(
                 f"**Topic {topic_id}:** {', '.join(keywords)}"
             )
 
+        # FEEDBACK RECORDS
         st.header("Customer Feedback Records")
 
         st.dataframe(
@@ -193,13 +299,17 @@ if uploaded_file is not None:
         )
 
         st.caption(
-            f"Displaying {len(analyzed_df)} processed feedback records."
+            f"Displaying the first {min(20, len(analyzed_df))} "
+            f"of {len(analyzed_df)} processed feedback records."
         )
 
     except Exception as error:
+
         st.error(f"Something went wrong: {error}")
 
+
 else:
+
     st.info(
         "Upload a customer feedback CSV file using the sidebar "
         "to begin your analysis."

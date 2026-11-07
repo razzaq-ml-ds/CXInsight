@@ -14,23 +14,80 @@ OPTIONAL_COLUMNS = [
 ]
 
 
-def load_and_clean_data(source):
+def normalize_column_names(df):
 
-    try:
-        df = pd.read_csv(source, encoding="utf-8-sig")
-    except Exception as error:
-        raise ValueError(f"Unable to read CSV file: {error}")
+    df = df.copy()
 
     df.columns = (
         df.columns
         .str.strip()
         .str.lower()
-        .str.replace(" ", "_")
+        .str.replace(r"\s+", "_", regex=True)
     )
-    # Map common dataset column names to CXInsight's standard names
 
+    return df
+
+
+def read_raw_data(source):
+
+    try:
+        if hasattr(source, "seek"):
+            source.seek(0)
+
+        df = pd.read_csv(source, encoding="utf-8-sig")
+
+    except Exception as error:
+        raise ValueError(f"Unable to read CSV file: {error}")
+
+    df = normalize_column_names(df)
+
+    return df
+
+
+def load_and_clean_data(source, feedback_column=None):
+
+    # Accept either an uploaded CSV or an already-read DataFrame
+    if isinstance(source, pd.DataFrame):
+        df = normalize_column_names(source)
+    else:
+        df = read_raw_data(source)
+
+    # Map the user-selected column to our standard column name
+    if feedback_column is not None:
+
+        selected_column = (
+            str(feedback_column)
+            .strip()
+            .lower()
+            .replace(" ", "_")
+        )
+
+        if selected_column not in df.columns:
+            raise ValueError(
+                f"Selected feedback column '{feedback_column}' "
+                "does not exist in the dataset."
+            )
+
+        df.rename(
+            columns={selected_column: "feedback_text"},
+            inplace=True
+        )
+
+    else:
+        # Backward compatibility for previously supported datasets
+        column_aliases = {
+            "review_text": "feedback_text"
+        }
+
+        for old_name, new_name in column_aliases.items():
+            if old_name in df.columns and new_name not in df.columns:
+                df.rename(
+                    columns={old_name: new_name},
+                    inplace=True
+                )
+
+    # Map optional columns
     column_aliases = {
-        "review_text": "feedback_text",
         "division_name": "category",
         "department_name": "category"
     }
@@ -42,7 +99,7 @@ def load_and_clean_data(source):
                 inplace=True
             )
 
-
+    # Check required columns
     missing_columns = [
         column
         for column in REQUIRED_COLUMNS
@@ -54,6 +111,7 @@ def load_and_clean_data(source):
             f"Missing required columns: {missing_columns}"
         )
 
+    # Keep only supported columns
     available_columns = [
         column
         for column in REQUIRED_COLUMNS + OPTIONAL_COLUMNS
@@ -62,6 +120,7 @@ def load_and_clean_data(source):
 
     df = df[available_columns].copy()
 
+    # Clean feedback text
     df["feedback_text"] = (
         df["feedback_text"]
         .fillna("")
@@ -69,13 +128,11 @@ def load_and_clean_data(source):
         .str.strip()
     )
 
+    df = df[df["feedback_text"] != ""].copy()
 
-    df = df[
-        df["feedback_text"] != ""
-    ].copy()
-
-
+    # Clean ratings
     if "rating" in df.columns:
+
         df["rating"] = pd.to_numeric(
             df["rating"],
             errors="coerce"
@@ -86,8 +143,9 @@ def load_and_clean_data(source):
             "rating"
         ] = None
 
-
+    # Clean NPS scores
     if "nps_score" in df.columns:
+
         df["nps_score"] = pd.to_numeric(
             df["nps_score"],
             errors="coerce"
@@ -98,13 +156,13 @@ def load_and_clean_data(source):
             "nps_score"
         ] = None
 
-
+    # Clean dates
     if "date" in df.columns:
+
         df["date"] = pd.to_datetime(
             df["date"],
             errors="coerce"
         )
-
 
     df.reset_index(drop=True, inplace=True)
 
