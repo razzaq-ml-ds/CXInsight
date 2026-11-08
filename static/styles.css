@@ -1,0 +1,448 @@
+/* CXInsight — warm, minimal, full-bleed
+   Edit this file to customize the interface. Restart Gradio after saving. */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap");
+
+:root {
+    color-scheme: light;
+    --cx-bg: #FAF9F5;
+    --cx-surface: #FFFFFF;
+    --cx-soft: #F4F2EA;
+    --cx-border: #E8E5DA;
+    --cx-border-soft: #EFEDE4;
+    --cx-text: #2B2A27;
+    --cx-muted: #85837C;
+    --cx-accent: #C96442;
+    --cx-accent-hover: #B5573A;
+    --cx-accent-tint: rgba(201, 100, 66, 0.12);
+    --cx-serif: "Source Serif 4", "Tiempos Text", Georgia, serif;
+    --cx-sans: "Inter", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --cx-radius: 16px;
+    --cx-pad: 56px;
+    --cx-shadow: 0 1px 2px rgba(43, 42, 39, 0.04), 0 8px 24px rgba(43, 42, 39, 0.05);
+}
+
+
+html, body, gradio-app, .gradio-container, .app, .main, .wrap.fillable {
+    background: var(--cx-bg) !important;
+}
+
+body, .gradio-container {
+    color: var(--cx-text) !important;
+    font-family: var(--cx-sans) !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+.gradio-container {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 var(--cx-pad) 48px !important;
+}
+
+/* Remove the white "card" Gradio puts around our custom HTML */
+.gradio-container .block.cx-bare,
+.gradio-container .cx-bare {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* ---------- Header (full-width sticky bar) ---------- */
+#cx-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    margin: 0 calc(var(--cx-pad) * -1) 0 !important;
+    padding: 14px var(--cx-pad) !important;
+    background: rgba(250, 249, 245, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: none !important;
+    border-bottom: 1px solid var(--cx-border) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+#cx-header > div {
+    min-height: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    justify-content: center !important;
+}
+
+.cx-brand-lockup {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.cx-brand-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cx-accent);
+    align-self: center;
+}
+
+.cx-brand-name {
+    font-family: var(--cx-serif);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    color: var(--cx-text);
+}
+
+.cx-brand-caption {
+    color: var(--cx-muted);
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+.cx-header-action-wrap {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.cx-header-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    white-space: nowrap;
+    color: var(--cx-text) !important;
+    text-decoration: none !important;
+    border: 1px solid var(--cx-border);
+    border-radius: 999px;
+    background: var(--cx-surface);
+    font-size: 13px;
+    font-weight: 500;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.cx-header-action:hover {
+    border-color: var(--cx-accent);
+    background: var(--cx-soft);
+}
+
+/* ---------- Top: hero left, upload right ---------- */
+#cx-top {
+    align-items: center !important;
+    gap: 56px !important;
+    padding: 72px 0 56px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#cx-top-left {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#cx-hero {
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    max-width: 680px;
+    background: transparent !important;
+}
+
+.cx-eyebrow {
+    color: var(--cx-accent);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+#cx-hero h1 {
+    margin: 0 !important;
+    color: var(--cx-text) !important;
+    font-family: var(--cx-serif) !important;
+    font-size: clamp(40px, 5.6vw, 76px) !important;
+    line-height: 1.04 !important;
+    font-weight: 400 !important;
+    letter-spacing: -2px !important;
+}
+
+#cx-hero h1 span {
+    color: var(--cx-muted);
+    font-style: italic;
+}
+
+#cx-hero p {
+    margin: 22px 0 0 !important;
+    color: var(--cx-muted) !important;
+    font-size: 17px !important;
+    line-height: 1.6;
+    max-width: 480px;
+}
+
+
+#cx-upload {
+    margin: 0 !important;
+    padding: 20px !important;
+    background: var(--cx-surface) !important;
+    border: 1px solid var(--cx-border) !important;
+    border-radius: 24px !important;
+    box-shadow: var(--cx-shadow) !important;
+    gap: 14px !important;
+}
+
+#cx-upload .block,
+#cx-upload .form {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#cx-status {
+    color: var(--cx-muted) !important;
+    font-size: 13px !important;
+    text-align: center;
+}
+
+button.primary {
+    color: #FFFFFF !important;
+    background: var(--cx-accent) !important;
+    border: 1px solid var(--cx-accent) !important;
+    border-radius: 12px !important;
+    font-family: var(--cx-sans) !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    box-shadow: none !important;
+    transition: background .2s ease, transform .1s ease;
+}
+
+button.primary:hover {
+    background: var(--cx-accent-hover) !important;
+    border-color: var(--cx-accent-hover) !important;
+}
+
+button.primary:active {
+    transform: scale(0.99);
+}
+
+.gradio-container button.secondary {
+    color: var(--cx-text) !important;
+    background: var(--cx-surface) !important;
+    border: 1px solid var(--cx-border) !important;
+    border-radius: 12px !important;
+}
+
+
+.cx-section {
+    padding: 0 !important;
+    margin: 56px 0 14px !important;
+}
+
+.cx-section h2 {
+    margin: 0 !important;
+    color: var(--cx-text) !important;
+    font-family: var(--cx-serif) !important;
+    font-size: 28px !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.5px !important;
+}
+
+.cx-subtitle {
+    margin-top: 6px;
+    color: var(--cx-muted) !important;
+    font-size: 14px !important;
+}
+
+/* ---------- KPI cards ---------- */
+.cx-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+    margin: 6px 0 8px;
+}
+
+.cx-kpi {
+    padding: 22px 20px 20px;
+    background: var(--cx-surface);
+    border: 1px solid var(--cx-border);
+    border-radius: var(--cx-radius);
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.cx-kpi:hover {
+    border-color: #DAD6C8;
+    box-shadow: var(--cx-shadow);
+}
+
+.cx-kpi-label {
+    margin-bottom: 12px;
+    color: var(--cx-muted);
+    font-size: 12px;
+}
+
+.cx-kpi-value {
+    color: var(--cx-text);
+    font-family: var(--cx-serif);
+    font-size: clamp(26px, 2.6vw, 36px);
+    font-weight: 400;
+    letter-spacing: -0.8px;
+}
+
+/* ---------- Gradio surfaces ---------- */
+.gradio-container .block,
+.gradio-container .form,
+.gradio-container .panel {
+    background-color: var(--cx-surface) !important;
+    border-color: var(--cx-border) !important;
+    border-radius: var(--cx-radius) !important;
+    box-shadow: none !important;
+}
+
+/* re-assert transparency for bare blocks (must come after the rule above) */
+.gradio-container .block.cx-bare {
+    background: transparent !important;
+    border: none !important;
+}
+
+.gradio-container label,
+.gradio-container .label-wrap span,
+.gradio-container span[data-testid="block-info"] {
+    color: var(--cx-muted) !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+}
+
+.gradio-container .prose,
+.gradio-container .prose * {
+    color: var(--cx-text);
+}
+
+.gradio-container input,
+.gradio-container textarea,
+.gradio-container select {
+    color: var(--cx-text) !important;
+    background: var(--cx-surface) !important;
+    border: 1px solid var(--cx-border) !important;
+    border-radius: 12px !important;
+    font-family: var(--cx-sans) !important;
+}
+
+.gradio-container input::placeholder,
+.gradio-container textarea::placeholder {
+    color: #B0AEA5 !important;
+}
+
+.gradio-container input:focus,
+.gradio-container textarea:focus {
+    border-color: var(--cx-accent) !important;
+    box-shadow: 0 0 0 3px var(--cx-accent-tint) !important;
+    outline: none !important;
+}
+
+.gradio-container input[type="checkbox"] {
+    accent-color: var(--cx-accent);
+    border-radius: 5px !important;
+}
+
+.gradio-container input[type="checkbox"]:checked {
+    background-color: var(--cx-accent) !important;
+    border-color: var(--cx-accent) !important;
+}
+
+/* File drop zone */
+.gradio-container [data-testid="file-upload"],
+.gradio-container .file-preview-holder,
+.gradio-container .upload-container {
+    background: var(--cx-soft) !important;
+    border: 1px dashed #D5D1C3 !important;
+    border-radius: 14px !important;
+    color: var(--cx-muted) !important;
+}
+
+/* Tables */
+.gradio-container .table-wrap,
+.gradio-container .wrap {
+    border-color: var(--cx-border) !important;
+}
+
+.gradio-container table thead th {
+    color: var(--cx-muted) !important;
+    background: var(--cx-soft) !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+}
+
+.gradio-container table tbody tr {
+    background: var(--cx-surface) !important;
+}
+
+.gradio-container table tbody tr:nth-child(even) {
+    background: #FCFBF8 !important;
+}
+
+.gradio-container table td {
+    color: var(--cx-text) !important;
+    border-color: var(--cx-border-soft) !important;
+}
+
+/* Plots */
+.gradio-container .plot-container,
+.gradio-container .plot {
+    background: transparent !important;
+    border-color: var(--cx-border) !important;
+}
+
+/* AI answer */
+#cx-ai-answer {
+    padding: 24px 28px !important;
+    background: var(--cx-surface) !important;
+    border: 1px solid var(--cx-border) !important;
+    border-radius: 20px !important;
+    line-height: 1.7;
+    min-height: 90px;
+}
+
+/* ---------- Footer ---------- */
+.cx-footer {
+    text-align: center;
+    color: var(--cx-muted);
+    border-top: 1px solid var(--cx-border);
+    padding: 28px 0 8px;
+    margin-top: 64px;
+    font-size: 12px;
+}
+
+footer {
+    display: none !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+    #cx-top {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 32px !important;
+        padding: 48px 0 40px !important;
+    }
+    .cx-kpi-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    :root { --cx-pad: 20px; }
+    .cx-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .cx-brand-caption {
+        display: none;
+    }
+}
