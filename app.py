@@ -156,6 +156,7 @@ if uploaded_file is not None:
         nps = analytics.get_nps()
         sentiment_percentages = analytics.get_sentiment_percentages()
         sentiment_counts = analytics.get_sentiment_distribution()
+        topic_sentiment = analytics.get_topic_sentiment()
 
         # BUSINESS OVERVIEW
         st.header("Business Overview")
@@ -291,18 +292,267 @@ if uploaded_file is not None:
                 f"**Topic {topic_id}:** {', '.join(keywords)}"
             )
 
+        st.divider()
 
-        st.header("Customer Feedback Records")
+        # TOPIC-LEVEL SENTIMENT ANALYSIS
+        st.header("Topic-Level Sentiment Analysis")
+
+        st.write(
+            "Understand which customer feedback topics have "
+            "the highest proportion of negative sentiment."
+        )
+
+        if not topic_sentiment.empty:
+
+            topic_sentiment["Topic"] = (
+                "Topic " + topic_sentiment["topic_id"].astype(str)
+            )
+
+            sentiment_plot_df = topic_sentiment.melt(
+                id_vars=["Topic"],
+                value_vars=[
+                    "positive_percentage",
+                    "negative_percentage",
+                    "neutral_percentage"
+                ],
+                var_name="Sentiment",
+                value_name="Percentage"
+            )
+
+            sentiment_plot_df["Sentiment"] = (
+                sentiment_plot_df["Sentiment"]
+                .str.replace("_percentage", "", regex=False)
+                .str.capitalize()
+            )
+
+            fig = px.bar(
+                sentiment_plot_df,
+                x="Topic",
+                y="Percentage",
+                color="Sentiment",
+                barmode="stack",
+                hover_data=["Percentage"],
+                title="Sentiment Distribution Across Topics"
+            )
+
+            fig.update_layout(
+                yaxis_title="Percentage (%)",
+                xaxis_title="Customer Feedback Topic",
+                yaxis_range=[0, 100]
+            )
+
+            st.plotly_chart(
+                fig,
+                use_container_width=True
+            )
+
+            st.subheader("Topics Ranked by Negative Sentiment")
+
+            display_columns = [
+                "topic_id",
+                "topic_label",
+                "total_feedback",
+                "positive_percentage",
+                "negative_percentage",
+                "neutral_percentage"
+            ]
+
+            st.dataframe(
+                topic_sentiment[display_columns],
+                use_container_width=True,
+                hide_index=True
+            )
+
+        else:
+            st.info("No topic sentiment data available.")
+
+
+
+
+        # FEEDBACK EXPLORER
+        st.divider()
+        st.header("Feedback Explorer")
+
+        st.write(
+            "Search customer reviews and apply filters "
+            "to find specific feedback."
+        )
+
+        # Collect filter inputs without triggering analysis
+        with st.form("feedback_explorer_form"):
+
+            search_query = st.text_input(
+                "Search within customer reviews",
+                placeholder="Try: delivery, sizing, quality, refund..."
+            )
+
+            filter_col1, filter_col2 = st.columns(2)
+
+            with filter_col1:
+
+                sentiment_options = [
+                    "Positive",
+                    "Negative",
+                    "Neutral"
+                ]
+
+                selected_sentiments = st.multiselect(
+                    "Filter by sentiment",
+                    options=sentiment_options,
+                    default=sentiment_options
+                )
+
+            with filter_col2:
+
+                if "topic_label" in analyzed_df.columns:
+
+                    topic_options = sorted(
+                        analyzed_df["topic_label"]
+                        .dropna()
+                        .unique()
+                        .tolist()
+                    )
+
+                    selected_topics = st.multiselect(
+                        "Filter by topic",
+                        options=topic_options,
+                        default=topic_options
+                    )
+
+                else:
+                    selected_topics = []
+
+            submitted = st.form_submit_button(
+                "Apply Filters",
+                use_container_width=True
+            )
+
+        # Only filter after the user clicks Submit
+        if submitted:
+
+            filtered_df = analyzed_df.copy()
+
+            filtered_df = filtered_df[
+                filtered_df["sentiment"].isin(
+                    selected_sentiments
+                )
+            ]
+
+            if "topic_label" in filtered_df.columns:
+                filtered_df = filtered_df[
+                    filtered_df["topic_label"].isin(
+                        selected_topics
+                    )
+                ]
+
+            if search_query.strip():
+
+                search_mask = (
+                    filtered_df["feedback_text"]
+                    .astype(str)
+                    .str.contains(
+                        search_query.strip(),
+                        case=False,
+                        na=False,
+                        regex=False
+                    )
+                )
+
+                filtered_df = filtered_df[search_mask]
+
+            st.divider()
+
+            st.metric(
+                "Matching Feedback Records",
+                len(filtered_df)
+            )
+
+            display_columns = [
+                column for column in [
+                    "feedback_text",
+                    "sentiment",
+                    "topic_label",
+                    "rating",
+                    "compound_score"
+                ]
+                if column in filtered_df.columns
+            ]
+
+            st.dataframe(
+                filtered_df[display_columns],
+                use_container_width=True,
+                hide_index=True
+            )
+
+            csv_data = filtered_df.to_csv(
+                index=False
+            ).encode("utf-8")
+
+            st.download_button(
+                label="Download Filtered Feedback CSV",
+                data=csv_data,
+                file_name="cxinsight_filtered_feedback.csv",
+                mime="text/csv"
+            )
+
+
+        # Apply filters
+        filtered_df = analyzed_df.copy()
+
+        filtered_df = filtered_df[
+            filtered_df["sentiment"].isin(selected_sentiments)
+        ]
+
+        if "topic_label" in filtered_df.columns:
+            filtered_df = filtered_df[
+                filtered_df["topic_label"].isin(selected_topics)
+            ]
+
+        if search_query.strip():
+            search_mask = filtered_df["feedback_text"].astype(
+                str
+            ).str.contains(
+                search_query.strip(),
+                case=False,
+                na=False,
+                regex=False
+            )
+
+            filtered_df = filtered_df[search_mask]
+
+        # Display results
+        st.metric(
+            "Matching Feedback Records",
+            len(filtered_df)
+        )
+
+        display_columns = [
+            column for column in [
+                "feedback_text",
+                "sentiment",
+                "topic_label",
+                "rating",
+                "compound_score"
+            ]
+            if column in filtered_df.columns
+        ]
 
         st.dataframe(
-            analyzed_df.head(20),
-            use_container_width=True
+            filtered_df[display_columns],
+            use_container_width=True,
+            hide_index=True
         )
 
-        st.caption(
-            f"Displaying the first {min(20, len(analyzed_df))} "
-            f"of {len(analyzed_df)} processed feedback records."
+        # Export filtered results
+        csv_data = filtered_df.to_csv(index=False).encode("utf-8")
+
+        st.download_button(
+            label="Download Filtered Feedback CSV",
+            data=csv_data,
+            file_name="cxinsight_filtered_feedback.csv",
+            mime="text/csv"
         )
+
         
         st.divider()
 

@@ -8,7 +8,6 @@ class CustomerAnalytics:
         self.df = df.copy()
 
     def get_total_feedback(self):
-
         return len(self.df)
 
     def get_sentiment_distribution(self):
@@ -31,7 +30,7 @@ class CustomerAnalytics:
         )
 
     def get_average_rating(self):
-        
+
         if "rating" not in self.df.columns:
             return None
 
@@ -46,7 +45,6 @@ class CustomerAnalytics:
         return round(ratings.mean(), 2)
 
     def get_nps(self):
-
 
         if "nps_score" not in self.df.columns:
             return None
@@ -71,3 +69,62 @@ class CustomerAnalytics:
         ) * 100
 
         return round(nps, 2)
+
+    def get_topic_sentiment(self):
+
+        required_columns = ["topic_id", "sentiment"]
+
+        for column in required_columns:
+            if column not in self.df.columns:
+                raise ValueError(
+                    f"Required column '{column}' is missing."
+                )
+
+        if self.df.empty:
+            return pd.DataFrame()
+
+        group_columns = ["topic_id"]
+
+        if "topic_label" in self.df.columns:
+            group_columns.append("topic_label")
+
+        summary = (
+            self.df.groupby(
+                group_columns + ["sentiment"],
+                dropna=False
+            )
+            .size()
+            .unstack(fill_value=0)
+        )
+
+        for sentiment in ["Positive", "Negative", "Neutral"]:
+            if sentiment not in summary.columns:
+                summary[sentiment] = 0
+
+        summary = summary[
+            ["Positive", "Negative", "Neutral"]
+        ]
+
+        summary["total_feedback"] = summary.sum(axis=1)
+
+        for sentiment in ["Positive", "Negative", "Neutral"]:
+            summary[f"{sentiment.lower()}_percentage"] = (
+                summary[sentiment]
+                / summary["total_feedback"]
+                * 100
+            ).round(2)
+
+        summary = summary.rename(columns={
+            "Positive": "positive_count",
+            "Negative": "negative_count",
+            "Neutral": "neutral_count"
+        })
+
+        summary = summary.reset_index()
+
+        summary = summary.sort_values(
+            by=["negative_percentage", "negative_count"],
+            ascending=False
+        ).reset_index(drop=True)
+
+        return summary
