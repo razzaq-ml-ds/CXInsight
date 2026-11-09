@@ -4,7 +4,6 @@ import tempfile
 import gradio as gr
 import pandas as pd
 import plotly.express as px
-import os
 
 from src.data_processor import read_raw_data, load_and_clean_data
 from src.column_detector import ColumnDetector
@@ -90,6 +89,9 @@ def style_chart(fig, height=360):
     return fig
 
 
+# --------------------------------------------------
+# ANALYSIS SERVICE
+# --------------------------------------------------
 
 def analyze_file(file_path):
 
@@ -245,6 +247,7 @@ def analyze_file(file_path):
 
         style_chart(topic_fig, height=430)
 
+        # AI context: aggregated statistics, not raw reviews
         context_lines = [
             f"Total feedback: {total}",
             f"Average rating: {rating}",
@@ -590,13 +593,10 @@ with gr.Blocks(
     )
 
 
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 7860))
-
     demo.launch(
-        server_name="0.0.0.0",
-        server_port=port,
-        inbrowser=False,
+        server_name="127.0.0.1",
+        server_port=7860,
+        inbrowser=True,
         show_error=True
     )

@@ -115,6 +115,23 @@ python gradio_app.py
 
 Open `http://127.0.0.1:7860` in your browser. Keep the terminal running while using the application.
 
+### 6. Deploy free on Render
+
+Render can host the Gradio application as a free web service. Free services
+sleep after inactivity, so the first request after a pause may take up to a
+minute.
+
+1. Push the repository to GitHub.
+2. Create an account at [render.com](https://render.com).
+3. Select **New > Blueprint** and choose this GitHub repository.
+4. Render detects `render.yaml` and creates the `cxinsight-student` service.
+5. Add `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` in the service's
+   environment variables if the AI assistant is needed.
+6. Deploy and open the generated `onrender.com` URL.
+
+The analytics dashboard works without Cloudflare credentials. Do not commit
+Cloudflare credentials to the repository.
+
 ## Running the tests
 
 Run commands from the repository root. In PowerShell:

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: cxinsight-student
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python gradio_app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
+      - key: CLOUDFLARE_MODEL
+        value: "@cf/zai-org/glm-4.7-flash"
