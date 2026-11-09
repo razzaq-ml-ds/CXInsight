@@ -1,3 +1,16 @@
+---
+title: CXInsight
+emoji: 📊
+colorFrom: yellow
+colorTo: red
+sdk: gradio
+sdk_version: 6.31.0
+python_version: "3.12"
+app_file: gradio_app.py
+short_description: Customer Intelligence with GenAI-powered insights
+license: mit
+---
+
 # CXInsight
 
 **Customer Experience Intelligence Platform**
