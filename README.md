@@ -41,6 +41,7 @@ CXInsights/
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
+├── render.yaml
 ├── static/
 │   └── styles.css
 ├── src/
@@ -58,7 +59,8 @@ CXInsights/
 │   ├── test_sentiment.py
 │   └── test_topics.py
 └── data/
-    └── sample_feedback.csv
+    ├── sample_feedback.csv
+    └── Womens Clothing E-Commerce Reviews.csv
 ```
 
 ## Getting started
@@ -150,6 +152,7 @@ These are script-based backend checks using the sample dataset and assertions wh
 ## Input data
 
 Upload a CSV containing customer feedback. CXInsight attempts to detect the feedback-text column automatically. A rating column can also be used for rating and NPS-related metrics when the expected data is present. A sample dataset is included for local testing.
+The NPS metric appears only when the CSV has an `nps_score` column (0-10). The included Women's Clothing dataset has no such column, so NPS shows as N/A.
 
 ## Customize the interface
 

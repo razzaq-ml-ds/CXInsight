@@ -280,6 +280,12 @@ def analyze_file(file_path):
             f"{suggested_column} | Detection confidence: {confidence}"
         )
 
+        if confidence != "High":
+            status += (
+                " | Warning: the feedback column was a best guess. "
+                "Please verify that it is the correct column."
+            )
+
         return (
             kpi_html,
             sentiment_fig,

@@ -55,7 +55,7 @@ def ask_cloudflare(user_prompt: str, context: str = "") -> str:
     )
 
     system_prompt = (
-        "You are SXOUND, a customer intelligence assistant. "
+        "You are CXInsight AI, a customer intelligence assistant. "
         "Help business owners make decisions using customer analytics. "
         "Use only the supplied evidence. Never invent statistics. "
         "Be concise, clear and actionable. "
